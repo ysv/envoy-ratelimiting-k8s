@@ -6,7 +6,8 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/ngin
 kubectl apply --namespace -f envoy-ingress.yaml
 helm upgrade my-envoy charts/envoy --install
 
-
+helm upgrade my-sample-service-1 charts/sample-service --install
+helm upgrade my-sample-service-2 charts/sample-service --install
 
 ##!/usr/bin/env bash
 #
