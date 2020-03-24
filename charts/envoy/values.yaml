@@ -13,8 +13,8 @@ strategy: |
     maxUnavailable: 1
 
 image:
-  repository: envoyproxy/envoy
-  tag: v1.11.1
+  repository: envoyproxy/envoy-alpine
+  tag: v1.13.1
   pullPolicy: IfNotPresent
 
 command:
@@ -22,6 +22,8 @@ command:
 args:
   - -l
   - $loglevel
+  - --service-cluster
+  - proxy
   - -c
   - /config/envoy.yaml
 
@@ -173,10 +175,38 @@ files:
                       prefix: "/service/2"
                     route:
                       cluster: service2
+                  rate_limits:
+                  - actions:
+                    - header_value_match:
+                        descriptor_value: quote-path-auth
+                        expect_match: false
+                        headers:
+                        - name: ":path"
+                          exact_match: "/quote"
+                        - name: "Authorization"
+                    stage: 0
+
               http_filters:
+              - name: envoy.rate_limit
+                config:
+                  domain: api
+                  stage: 0
+                  request_type: both
+                  failure_mode_deny: true
+                  rate_limit_service:
+                    grpc_service:
+                      envoy_grpc:
+                        cluster_name: ratelimit
               - name: envoy.router
                 typed_config: {}
       clusters:
+      - name: ratelimit
+        type: strict_dns
+        connect_timeout: 0.25s
+        lb_policy: ROUND_ROBIN
+        hosts: [{ socket_address: { address: my-ratelimit, port_value: 8081 }}]
+        http2_protocol_options: {}
+
       - name: service1
         connect_timeout: 0.25s
         type: strict_dns

@@ -25,10 +25,10 @@ securityContext: {}
 
 ports:
   grpc:
-    containerPort: 8080
+    containerPort: 8081
     protocol: TCP
   rest:
-    containerPort: 8081
+    containerPort: 8080
     protocol: TCP
   debug:
     containerPort: 6070
@@ -71,19 +71,14 @@ env:
   RUNTIME_SUBDIRECTORY: ratelimit
 
 files:
-  api.yaml: |-
+  api.yml: |-
     domain: api
     descriptors:
-    - key: remote_address
+    - key: header_match
+      value: quote-path-auth
       rate_limit:
         unit: minute
-        requests_per_unit: 15
-
-    - key: remote_address
-      value: 127.0.0.1
-      rate_limit:
-        unit: minute
-        requests_per_unit: 50
+        requests_per_unit: 2
 
 nodeSelector: {}
 
