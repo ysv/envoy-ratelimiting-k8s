@@ -34,7 +34,6 @@ ports:
     containerPort: 6070
     protocol: TCP
 
-
 ingress:
   enabled: false
   annotations: {}
@@ -49,6 +48,7 @@ ingress:
   #      - chart-example.local
 
 # TODO: Don't need a lot of resources.
+# TODO: Health & livenes checks
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -60,6 +60,30 @@ resources: {}
   # requests:
   #   cpu: 100m
   #   memory: 128Mi
+
+env:
+  REDIS_AUTH: vE0jS2sbtI
+  USE_STATSD: false
+  LOG_LEVEL: debug
+  REDIS_SOCKET_TYPE: tcp
+  REDIS_URL: my-redis-master:6379
+  RUNTIME_ROOT: /data
+  RUNTIME_SUBDIRECTORY: ratelimit
+
+files:
+  api.yaml: |-
+    domain: api
+    descriptors:
+    - key: remote_address
+      rate_limit:
+        unit: minute
+        requests_per_unit: 15
+
+    - key: remote_address
+      value: 127.0.0.1
+      rate_limit:
+        unit: minute
+        requests_per_unit: 50
 
 nodeSelector: {}
 

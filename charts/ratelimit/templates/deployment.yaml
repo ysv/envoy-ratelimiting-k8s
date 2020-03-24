@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         {{- include "ratelimit.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print .Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -20,8 +22,12 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.repository }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/ratelimit
+          env:
+            {{ include "env" . | nindent 12 }}
           ports:
             {{- with .Values.ports }}
             {{- range $key, $port := . }}
@@ -29,6 +35,9 @@ spec:
               {{ toYaml $port | nindent 14 }}
             {{- end }}
             {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /data/ratelimit
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -41,3 +50,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ template "ratelimit.fullname" . }}

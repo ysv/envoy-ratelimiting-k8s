@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ratelimit.fullname" . }}
+  labels:
+    app: {{ template "ratelimit.name" . }}
+    chart: {{ template "ratelimit.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- include "ratelimit.labels" . | nindent 4 }}
+
+data:
+{{- range $key, $value := .Values.files }}
+  {{ $key }}: |-
+{{ $value | default "" | indent 4 }}
+{{- end -}}
