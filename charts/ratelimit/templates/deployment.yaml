@@ -25,7 +25,9 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-            - /bin/ratelimit
+            - /bin/sh
+            - -c
+            - "mkdir -p /data/ratelimit/config && ln -s /data/configmap/*.yml data/ratelimit/config && /bin/ratelimit"
           env:
             {{ include "env" . | nindent 12 }}
           ports:
@@ -37,7 +39,7 @@ spec:
             {{- end }}
           volumeMounts:
             - name: config
-              mountPath: /data/ratelimit
+              mountPath: /data/configmap
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

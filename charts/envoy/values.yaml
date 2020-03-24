@@ -21,7 +21,7 @@ command:
   - /usr/local/bin/envoy
 args:
   - -l
-  - $loglevel
+  - debug
   - --service-cluster
   - proxy
   - -c
@@ -141,7 +141,7 @@ files:
     ## - https://www.envoyproxy.io/docs/envoy/latest/start/start#quick-start-to-run-simple-example
     ## - https://raw.githubusercontent.com/envoyproxy/envoy/master/configs/google_com_proxy.v2.yaml
     admin:
-      access_log_path: "/dev/null"
+      access_log_path: "/dev/stdout"
       address:
         socket_address:
           address: 0.0.0.0
