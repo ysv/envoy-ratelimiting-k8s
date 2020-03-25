@@ -74,11 +74,16 @@ files:
   api.yml: |-
     domain: api
     descriptors:
-    - key: header_match
-      value: quote-path-auth
+    - key: remote_address
       rate_limit:
         unit: minute
-        requests_per_unit: 2
+        requests_per_unit: 3
+
+    - key: remote_address
+      value: 127.0.0.1
+      rate_limit:
+        unit: minute
+        requests_per_unit: 15
 
 nodeSelector: {}
 

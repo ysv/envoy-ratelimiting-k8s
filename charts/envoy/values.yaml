@@ -21,7 +21,7 @@ command:
   - /usr/local/bin/envoy
 args:
   - -l
-  - debug
+  - $loglevel
   - --service-cluster
   - proxy
   - -c
@@ -141,7 +141,7 @@ files:
     ## - https://www.envoyproxy.io/docs/envoy/latest/start/start#quick-start-to-run-simple-example
     ## - https://raw.githubusercontent.com/envoyproxy/envoy/master/configs/google_com_proxy.v2.yaml
     admin:
-      access_log_path: "/dev/stdout"
+      access_log_path: "/dev/null"
       address:
         socket_address:
           address: 0.0.0.0
@@ -177,13 +177,7 @@ files:
                       cluster: service2
                   rate_limits:
                   - actions:
-                    - header_value_match:
-                        descriptor_value: quote-path-auth
-                        expect_match: false
-                        headers:
-                        - name: ":path"
-                          exact_match: "/quote"
-                        - name: "Authorization"
+                    - remote_address: {}
                     stage: 0
 
               http_filters:
