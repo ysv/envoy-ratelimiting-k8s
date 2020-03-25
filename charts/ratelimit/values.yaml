@@ -73,17 +73,46 @@ env:
 files:
   api.yml: |-
     domain: api
-    descriptors:
-    - key: remote_address
-      rate_limit:
-        unit: minute
-        requests_per_unit: 3
 
-    - key: remote_address
-      value: 127.0.0.1
+    descriptors:
+    # Limit requests in case of missing CF-Connecting-IP.
+    - key: header_match
+      value: cf-ip-missing
       rate_limit:
         unit: minute
-        requests_per_unit: 15
+        requests_per_unit: 0
+
+    # Blacklisted IP Address.
+    - key: cf-ip-address
+      value: "45.128.133.242"
+      rate_limit:
+        unit: minute
+        requests_per_unit: 0
+
+    # Whitelisted IP Address.
+    - key: cf-ip-address
+      value: "163.172.165.12"
+      rate_limit:
+        unit: minute
+        requests_per_unit: 10
+      descriptors:
+      - key: header_match
+        value: sensetive-path
+        rate_limit:
+          unit: minute
+          requests_per_unit: 5
+
+    # Common IP Address.
+    - key: cf-ip-address
+      rate_limit:
+        unit: minute
+        requests_per_unit: 5
+      descriptors:
+      - key: header_match
+        value: sensetive-path
+        rate_limit:
+          unit: minute
+          requests_per_unit: 2
 
 nodeSelector: {}
 
