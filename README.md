@@ -1,5 +1,7 @@
 ## Testing
 
+### Curl
+
 #### Missing IP Address
 
 Limited to zero requests per minute if `CF-Connecting-IP` Header is missing. 
@@ -135,4 +137,11 @@ for i in {1..7}; do
   curl -s -H "CF-Connecting-IP: $WHITELISTED_IP" -o /dev/null -w "$(($i*2)): service/1->%{http_code}\n" http://cs.ysv.pp.ua/service/1  
   sleep 0.5
 done
+```
+
+### Vegeta
+
+TODO: Write test cases with vegeta.
+```bash
+echo "GET https://rl.test.coinselect.com/service/1" | vegeta attack -duration=10s | tee results.bin | vegeta report
 ```
